@@ -2,7 +2,7 @@ FROM waggle/plugin-opencv:4.1.1-cuda
 
 COPY /app /plugin
 
-RUN pip3 --no-cache-dir install /plugin/requirements.txt
+RUN pip3 --no-cache-dir install -r /plugin/requirements.txt
 
 WORKDIR /plugin
 
