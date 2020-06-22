@@ -51,18 +51,17 @@ def run(model, args):
         input_image = Image.open(args.input)
         input_image = input_image.resize((300, 300))
 
-        output_name = os.path.basename(args.input) + "_out.jpg"
-        output_path = os.path.join(args.output, output_name)
+        if args.save == True:
+            output_name = os.path.basename(args.input) + "_out.jpg"
+            output_path = os.path.join(args.output, output_name)
 
-
-    print(output_path)
 
     if type(input_image.size) != tuple:   ## --input live
         size = (300, 300)
-        print(size)
+        #print(size)
     else:
         size = input_image.size
-        print(size)
+        #print(size)
 
     preprocess = transforms.Compose([
         transforms.ToTensor(),
@@ -92,6 +91,8 @@ def run(model, args):
         #r = Image.fromarray(output_predictions.byte().cpu().numpy()).resize(input_image.size)
         r.putpalette(colors)
         r.convert('RGB').save(output_path)
+    else:
+        r = Image.fromarray(output_predictions.byte().cpu().numpy()).resize(size)
 
 
     ## calculate ratio
@@ -105,7 +106,7 @@ def run(model, args):
     total = output_predictions.shape[0] * output_predictions.shape[1]
     ratio = round((cloud / total), 5)
 
-    return value
+    return ratio
 
 
 if __name__ == "__main__":
@@ -165,11 +166,12 @@ if __name__ == "__main__":
             value = run(model, args)
 
             plugin.add_measurement({
-                'sensor_id': 0x3002,
-                'parameter_id': 1,
+                'id': 0x3002,
+                'sub_id': 1,
                 'value': value,
             })
             print('publish', flush=True)
             plugin.publish_measurements()
 
             time.sleep(args.interval)
+
