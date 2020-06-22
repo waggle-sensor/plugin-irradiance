@@ -27,11 +27,22 @@ To test the script with:
 
 #### on development get an image from local filesystem
 ```
-$ plugin_cloud_seg.py --fcn 50 --model /storage/fcn/sp_fcn_pytorch/logs/484cum_working/MODEL-resnet50/model_best.pth.tar --n_classes 2 --input image.jpg --output ./output --save true --mode test 
+$ plugin_cloud_seg.py --fcn 50 \
+  --model ./model_best.pth.tar \
+  --n_classes 2 \
+  --input image.jpg \
+  --output ./output \
+  --save true --mode test 
 ```
 #### on testing get an image from a stream of a camera
 ```
-$ plugin_cloud_seg.py --fcn 50 --model /storage/fcn/sp_fcn_pytorch/logs/484cum_working/MODEL-resnet50/model_best.pth.tar --n_classes 2 --input http://camera:8090/live --output ./output --save true --mode test 
+$ plugin_cloud_seg.py --fcn 50 \
+  --model ./model_best.pth.tar \
+  --n_classes 2 \
+  --input http://camera:8090/live \
+  --output ./output \
+  --save true \
+  --mode test 
 ```
 
 #### Registering The Application to Edge Code Repository
