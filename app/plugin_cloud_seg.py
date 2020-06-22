@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# ANL:waggle-license
+#  This file is part of the Waggle Platform.  Please see the file
+#  LICENSE.waggle.txt for the legal details of the copyright and software
+#  license.  For more details on the Waggle project, visit:
+#           http://www.wa8.gl
+# ANL:waggle-license
+
 import sys
 import os
 import argparse
@@ -11,57 +19,36 @@ import numpy as np
 import time
 import datetime
 
-### start plugin-hello
-#!/usr/bin/env python3
-# ANL:waggle-license
-#  This file is part of the Waggle Platform.  Please see the file
-#  LICENSE.waggle.txt for the legal details of the copyright and software
-#  license.  For more details on the Waggle project, visit:
-#           http://www.wa8.gl
-# ANL:waggle-license
 import waggle.plugin
 import time
 import logging
 
 plugin = waggle.plugin.Plugin()
-#### end plugin-hello
 
-def live_feed():
-    #cap = cv2.VideoCapture('http://${name}:8090/live')
-    cap = cv2.VideoCapture('./image/0021.png')
+def live_feed(input):
+    cap = cv2.VideoCapture(input)
     _, image = cap.read()
 
     return image
 
 def run(model, args):
-    if args.input == 'live':
-        input_image = live_feed()
-        input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
+    input_image = live_feed(args.input)
+    input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
 
-        if args.save == True:
-            filename = args.str_timestamp + '.jpg'
-            cv2.imwrite(os.path.join(args.output, filename), input_image)
+    input_width = input_image.shape[0]
+    input_height = input_image.shape[1]
+    print(input_width, input_height)
 
-            outputname = args.str_timestamp + '_cloud.jpg'
-            output_path = os.path.join(args.output, outputname)
+    if args.save == True:
+        filename = args.str_timestamp + '.jpg'
+        cv2.imwrite(os.path.join(args.output, filename), input_image)
 
-        input_image = cv2.resize(input_image, (300, 300))
-    else:
-        #image = cv2.imread(args.input)
-        input_image = Image.open(args.input)
-        input_image = input_image.resize((300, 300))
+        outputname = args.str_timestamp + '_cloud.jpg'
+        output_path = os.path.join(args.output, outputname)
 
-        if args.save == True:
-            output_name = os.path.basename(args.input) + "_out.jpg"
-            output_path = os.path.join(args.output, output_name)
+    input_image = cv2.resize(input_image, (300, 300))
 
-
-    if type(input_image.size) != tuple:   ## --input live
-        size = (300, 300)
-        #print(size)
-    else:
-        size = input_image.size
-        #print(size)
+    size = (input_width, input_height)
 
     preprocess = transforms.Compose([
         transforms.ToTensor(),
@@ -174,4 +161,5 @@ if __name__ == "__main__":
             plugin.publish_measurements()
 
             time.sleep(args.interval)
+
 
