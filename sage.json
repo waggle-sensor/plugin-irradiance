@@ -1,0 +1,37 @@
+{
+    "architecture": [
+        "linux/amd64",
+        "linux/arm/v7",
+        "linux/arm64"
+    ],
+    "arguments": [
+        "speed",
+        "15",
+        "input",
+        "http://camera:8090/live",
+        "model",
+        "./model_best.pth.tar",
+        "n_classes",
+        "2",
+        "output",
+        "./output",
+        "save",
+        "true",
+        "mode",
+        "deploy"
+    ],
+    "description": "my hello world app",
+    "inputs": [
+        {
+            "id": "ratio",
+            "type": "float"
+        }
+    ],
+    "metadata": {
+        "my-science-data": 101
+    },
+    "name": "FCN_cloud_plugin",
+    "namespace": "waggle",
+    "source": "https://github.com/waggle-sensor/plugin-FCN-cloud.git#master#./Dockerfile",
+    "version": "1.0.0"
+}
