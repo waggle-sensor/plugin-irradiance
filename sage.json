@@ -32,7 +32,7 @@
     },
     "id": 101,
     "name": "fcn_cloud_plugin",
-    "namespace": "waggle",
+    "namespace": "sage",
     "source": "https://github.com/waggle-sensor/plugin-fcn-cloud.git#master#./Dockerfile",
-    "version": "1.0.0"
+    "version": "0.1.0"
 }

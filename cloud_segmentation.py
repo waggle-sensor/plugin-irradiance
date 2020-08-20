@@ -9,6 +9,13 @@
 import sys
 import os
 import argparse
+import time
+import datetime
+import time
+import logging
+import requests
+from io import BytesIO
+from urllib.error import HTTPError
 
 import torch
 from torchvision import transforms
@@ -16,28 +23,49 @@ from PIL import Image
 
 import cv2
 import numpy as np
-import time
-import datetime
 
 import waggle.plugin
-import time
-import logging
 
 plugin = waggle.plugin.Plugin()
 
-def live_feed(input):
-    cap = cv2.VideoCapture(input)
-    _, image = cap.read()
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
 
-    return image
+def live_feed(input):
+    #cap = cv2.VideoCapture('http://${name}:8090/live')
+    #cap = cv2.VideoCapture('./image/0021.png')
+    if 'http' in input and '.jpg' in input:
+        try:
+            response = requests.get(input, stream=True).raw
+            image_arr = np.asarray(bytearray(response.read()), dtype=np.uint8)
+            image = cv2.imdecode(image_arr, cv2.IMREAD_COLOR)
+            return image
+        except HTTPError as http_err:
+            logging.error('HTTP error occurred: {}'.format(str(http_err)))
+        except Exception as err:
+            logging.error('Other error occurred: {}'.format(str(err)))
+    else:
+        cap = cv2.VideoCapture(input)
+        ret, image = cap.read()
+        cap.close()
+        if ret is False:
+            logging.error('cv2.VideoCapture could not get a frame from {}'.format(input))
+        else:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            return image
+    return None
+
 
 def run(model, args):
     input_image = live_feed(args.input)
-    input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
+    if input_image is None:
+        logging.error('No input received.')
+        return
 
     input_width = input_image.shape[0]
     input_height = input_image.shape[1]
-    print(input_width, input_height)
 
     if args.save == True:
         filename = args.str_timestamp + '.jpg'
@@ -48,6 +76,35 @@ def run(model, args):
 
     input_image = cv2.resize(input_image, (300, 300))
 
+    """
+    if 'jpg' in args.input or 'png' in args.input or 'jpeg' in args.input:
+        #image = cv2.imread(args.input)
+        input_image = Image.open(args.input)
+        input_image = input_image.resize((300, 300))
+
+        if args.save == True:
+            output_name = os.path.basename(args.input) + "_out.jpg"
+            output_path = os.path.join(args.output, output_name)
+    else:
+        input_image = live_feed(args)
+        input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
+
+        if args.save == True:
+            filename = args.str_timestamp + '.jpg'
+            cv2.imwrite(os.path.join(args.output, filename), input_image)
+
+            outputname = args.str_timestamp + '_cloud.jpg'
+            output_path = os.path.join(args.output, outputname)
+
+        input_image = cv2.resize(input_image, (300, 300))
+
+    if type(input_image.size) != tuple:   ## --input live
+        size = (300, 300)
+        #print(size)
+    else:
+        size = input_image.size
+        #print(size)
+    """
     size = (input_width, input_height)
 
     preprocess = transforms.Compose([
@@ -114,7 +171,6 @@ if __name__ == "__main__":
 
     args.backbone = 'resnet'
 
-
     if args.save == True:
         timestamp = datetime.datetime.now()
         timestamp = timestamp.astimezone(datetime.timezone(datetime.timedelta(0)))
@@ -125,16 +181,16 @@ if __name__ == "__main__":
         exit(0)
 
     if not os.path.exists(args.output):
-        os.makedirs(args.output)
+        os.makedirs(args.output, exist_ok=True)
 
-    from importlib import import_module
-    model_module = import_module('models.{}.fcn{}'.format(args.backbone, args.fcn))
-    model = model_module.FCN(n_class=int(args.n_classes))
+    logging.info('Loading model {}...'.format(args.model))
+    if torch.cuda.is_available():
+        model = torch.load(args.model)
+    else:
+        model = torch.load(args.model, map_location=torch.device('cpu'))
+    model.eval()
 
-    checkpoint = torch.load(args.model)
-    model.load_state_dict(checkpoint['model_state_dict'])
-
-
+    logging.info('Run {} mode'.format(args.mode))
     if args.mode == 'profile':
         try:
             while True:
@@ -161,5 +217,4 @@ if __name__ == "__main__":
             plugin.publish_measurements()
 
             time.sleep(args.interval)
-
 
