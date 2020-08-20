@@ -27,7 +27,7 @@ To test the script with:
 
 #### on development get an image from local filesystem
 ```
-$ plugin_cloud_seg.py --fcn 50 \
+$ cloud_segmentation.py --fcn 50 \
   --model ./model_best.pth.tar \
   --n_classes 2 \
   --input image.jpg \
@@ -36,7 +36,7 @@ $ plugin_cloud_seg.py --fcn 50 \
 ```
 #### on testing get an image from a stream of a camera
 ```
-$ plugin_cloud_seg.py --fcn 50 \
+$ cloud_segmentation --fcn 50 \
   --model ./model_best.pth.tar \
   --n_classes 2 \
   --input http://camera:8090/live \

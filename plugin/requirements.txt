@@ -1,5 +1,0 @@
-git+https://github.com/waggle-sensor/pywaggle@v0.30.0
-torch
-torchvision
-tensorboard
-tqdm
