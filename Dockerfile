@@ -10,7 +10,7 @@ COPY models /app/models
 ENV WAGGLE_PLUGIN_ID="101" \
     WAGGLE_PLUGIN_VERSION="0.1.0" \
     WAGGLE_PLUGIN_NAME="fcn_cloud_plugin" \
-    WAGGLE_PLUGIN_REF="https://github.com/waggle-sensor/plugin-fcn-cloud"
+    WAGGLE_PLUGIN_REF="https://github.com/waggle-sensor/plugin-fcn-cloud" \
     SAGE_HOST="https://sage-storage-api.nautilus.optiputer.net"
 
 RUN pip3 install --no-cache-dir git+https://github.com/sagecontinuum/sage-cli.git
