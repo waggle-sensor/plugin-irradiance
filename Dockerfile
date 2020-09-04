@@ -13,7 +13,7 @@ ENV WAGGLE_PLUGIN_ID="101" \
     WAGGLE_PLUGIN_REF="https://github.com/waggle-sensor/plugin-fcn-cloud" \
     SAGE_STORE_URL="https://sage-storage-api.nautilus.optiputer.net"
 
-RUN pip3 --no-cache-dir install pip3 install git+https://github.com/sagecontinuum/sage-storage-py.git
+RUN pip3 --no-cache-dir install git+https://github.com/sagecontinuum/sage-storage-py.git
 RUN pip3 --no-cache-dir install git+https://github.com/sagecontinuum/sage-cli.git
 RUN sage-cli.py storage files \
   download e07607b5-cb20-492a-b377-e37cf3b79e4f fcn_resnet101.pth.tar \
